@@ -10,8 +10,6 @@ import 'package:go_smart_admin_windos/app/admin_caclye/models/register_delivery_
 import 'package:go_smart_admin_windos/helpers/dio_client.dart';
 
 class PosApis {
-  static const int _maxRetries = 20;
-  static const Duration _retryDelay = Duration(seconds: 2);
   static String urlLink = "";
 
   /// Ensure urlLink is set before making API calls
@@ -22,30 +20,8 @@ class PosApis {
     return urlLink;
   }
 
-  /// Generic helper for retrying requests on status 500
-  Future<T?> _retryRequest<T>(Future<Response> Function() request, T Function(dynamic data) parser, {int retryCount = 0}) async {
-    try {
-      final response = await request();
-
-      if (response.statusCode == 200) {
-        return parser(response.data);
-      } else if (response.statusCode == 500 && retryCount < _maxRetries) {
-        await Future.delayed(_retryDelay);
-        return _retryRequest(request, parser, retryCount: retryCount + 1);
-      } else {
-        return null;
-      }
-    } catch (e) {
-      if (retryCount < _maxRetries) {
-        await Future.delayed(_retryDelay);
-        return _retryRequest(request, parser, retryCount: retryCount + 1);
-      } else {
-        throw 'API error after $_maxRetries retries >> $e';
-      }
-    }
-  }
-
   /// Always update urlLink here
+
   Future<String?> getLinkUrlBranch({required String dbName}) async {
     final url = 'http://65.109.226.255:12000/get_db_name_record_data/';
     try {
@@ -65,7 +41,7 @@ class PosApis {
 
   Future<RegisterDeliveryPayment?> generateAndRegisterDeliveryOrder(int orderId, int journalId) async {
     final base = _ensureUrlLink();
-    return _retryRequest(() async {
+    return Client().retryRequest(() async {
       final response = await Client.client.get('$base/generate_delivery_order_invoice/$orderId');
 
       if (response.statusCode == 200) {
@@ -83,7 +59,7 @@ class PosApis {
 
   Future<AllSessionOrders?> getAllSessionOrders(int sessionId) async {
     final base = _ensureUrlLink();
-    return _retryRequest(
+    return Client().retryRequest(
       () => Client.client.get('$base/get_session_orders/$sessionId'),
       (data) => AllSessionOrders.fromJson(data),
     );
@@ -91,12 +67,12 @@ class PosApis {
 
   Future<AllPos?> getAllPos() async {
     final base = _ensureUrlLink();
-    return _retryRequest(() => Client.client.get('$base/get_all_pos'), (data) => AllPos.fromJson(data));
+    return Client().retryRequest(() => Client.client.get('$base/get_all_pos'), (data) => AllPos.fromJson(data));
   }
 
   Future<PosSessions?> getPosSessions(int posId) async {
     final base = _ensureUrlLink();
-    return _retryRequest(() => Client.client.get('$base/get_pos_sessions/$posId'), (data) => PosSessions.fromJson(data));
+    return Client().retryRequest(() => Client.client.get('$base/get_pos_sessions/$posId'), (data) => PosSessions.fromJson(data));
   }
 
   // Future<OpenPosSession?> openNewPosSession(
@@ -107,7 +83,7 @@ class PosApis {
   //   String openingNote,
   // ) async {
   //   final base = _ensureUrlLink();
-  //   return _retryRequest(
+  //   return Client().retryRequest(
   //     () => Client.client.post(
   //       '$base/open_pos_session',
   //       data: {
@@ -124,12 +100,15 @@ class PosApis {
 
   Future<CurrentSession?> getCurrentSessionData(int posId) async {
     final base = _ensureUrlLink();
-    return _retryRequest(() => Client.client.get('$base/get_pos_latest_session/$posId'), (data) => CurrentSession.fromJson(data));
+    return Client().retryRequest(
+      () => Client.client.get('$base/get_pos_latest_session/$posId'),
+      (data) => CurrentSession.fromJson(data),
+    );
   }
 
   Future<allkiosk.AllKioskOrders?> getAllKioskOrders(int sessionId) async {
     final base = _ensureUrlLink();
-    return _retryRequest(
+    return Client().retryRequest(
       () => Client.client.get('$base/get_session_all_kiosk_orders/$sessionId'),
       (data) => allkiosk.AllKioskOrders.fromJson(data),
     );
@@ -137,6 +116,6 @@ class PosApis {
 
   // Future<int?> getCustomerID() async {
   //   final base = _ensureUrlLink();
-  //   return _retryRequest(() => Client.client.get('$base/get_customer_account'), (data) => data['data'] as int);
+  //   return Client().retryRequest(() => Client.client.get('$base/get_customer_account'), (data) => data['data'] as int);
   // }
 }
