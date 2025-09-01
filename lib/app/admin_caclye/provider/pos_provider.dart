@@ -1,24 +1,14 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/all_pos.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/all_kiosk_orders.dart' as allkiosk;
 import 'package:go_smart_admin_windos/app/admin_caclye/models/all_session_orders.dart' as allsessionorders;
 import 'package:go_smart_admin_windos/app/admin_caclye/models/all_users.dart' as du;
-import 'package:go_smart_admin_windos/app/admin_caclye/models/available_payment_methods.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/current_session.dart';
-import 'package:go_smart_admin_windos/app/admin_caclye/models/open_pos_session.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/pos_sessions.dart' as ps;
 import 'package:go_smart_admin_windos/app/admin_caclye/services/pos_apis.dart';
 import 'package:go_smart_admin_windos/app/auth_branches_caclye/model/login_model.dart';
-import 'package:go_smart_admin_windos/helpers/navigation_helper.dart';
-import 'package:go_smart_admin_windos/main.dart';
-import 'package:go_smart_admin_windos/widget/unclosable_ok_dialog.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:image/image.dart' as img;
+
 // import 'package:gosmart_pos/app/pos_cycle/models/search_by_receipt.dart' as refundorder;
 
 class PosProvider with ChangeNotifier {
@@ -166,12 +156,12 @@ class PosProvider with ChangeNotifier {
 
   List<ps.Datum> _allSessionsSearchResult = [];
 
-  final OpenPosSession _openPosSession = OpenPosSession();
+  // final OpenPosSession _openPosSession = OpenPosSession();
 
   CurrentSession _currentSession = CurrentSession();
   allkiosk.AllKioskOrders _allKioskOrders = allkiosk.AllKioskOrders();
 
-  final AvailablePaymentMethods _availablePaymentMethods = AvailablePaymentMethods();
+  // final AvailablePaymentMethods _availablePaymentMethods = AvailablePaymentMethods();
   final int _selectedPaymentMethodId = 0;
   final String _selectedPaymentMethodName = '';
 

@@ -51,7 +51,7 @@ class _AdminWebviewScreenState extends State<AdminWebviewScreen> {
     if (_odooSessionId.isEmpty) return;
     // Setting the cookie BEFORE any navigation
     await _cookieManager.setCookie(
-      url: WebUri(widget.urlLink!),
+      url: WebUri(widget.urlLink),
       domain: 'pos-c1.gosmart.eg',
       name: 'session_id',
       value: _odooSessionId,

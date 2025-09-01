@@ -27,3 +27,7 @@ var loginRegisterTextBorder = OutlineInputBorder(
   borderRadius: BorderRadius.circular(20.r),
   borderSide: const BorderSide(color: Color.fromRGBO(233, 239, 240, 1)),
 );
+var errorBorder = OutlineInputBorder(
+  borderRadius: BorderRadius.circular(20.r),
+  borderSide: const BorderSide(color: Colors.red),
+);

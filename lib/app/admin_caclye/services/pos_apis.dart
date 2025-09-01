@@ -5,7 +5,6 @@ import 'package:go_smart_admin_windos/app/admin_caclye/models/all_kiosk_orders.d
 import 'package:go_smart_admin_windos/app/admin_caclye/models/all_session_orders.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/current_session.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/generate_delivery_payment.dart';
-import 'package:go_smart_admin_windos/app/admin_caclye/models/open_pos_session.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/pos_sessions.dart';
 import 'package:go_smart_admin_windos/app/admin_caclye/models/register_delivery_payment.dart';
 import 'package:go_smart_admin_windos/helpers/dio_client.dart';

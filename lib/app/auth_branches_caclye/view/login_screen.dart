@@ -41,12 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loadId() async {
-    final email = emailController.text;
-    final pass = passwordController.text;
-
     deviceId = (await PlatformDeviceId.getDeviceId)!.toLowerCase().trim();
-    await AuthApis().setClientuniqueId(emailController.text.trim(), passwordController.text, deviceId.trim());
-
     setState(() {});
   }
 
@@ -61,18 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future<void> _lodinWithId() async {
-    //  if (emailController.text.isEmpty || passwordController.text.isEmpty|| deviceId!="") {
-    //     showDialog(
-    //       context: context,
-    //       builder: (context) => OkDialog(text: "Please enter email and password"),
-    //     );
-    //     return;
-    //   }
-
+  Future<void> _loginWithId() async {
     await AuthApis().login(emailController.text.trim(), passwordController.text, deviceId.trim()).then((loginData) async {
-      await _loadId();
       print("object $deviceId");
+
       if (loginData == null) {
         Login();
       } else {
@@ -80,6 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (loginData.status == 1) {
           _loginAdminFlow();
         } else {
+          Navigation().closeDialog(context);
+          await AuthApis().setClientuniqueId(emailController.text.trim(), deviceId.trim());
           showDialog(
             context: context,
             builder: (context) => OkDialog(text: loginData.messageAr!),
@@ -104,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (loginResponse.status != 1) {
         Navigation().closeDialog(context);
         if (!mounted) return;
+        Navigation().closeDialog(context);
         showDialog(
           context: context,
           builder: (_) => OkDialog(text: loginResponse.messageAr ?? 'login_failed'.tr()),
@@ -111,15 +101,15 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      if (loginResponse.status == 1 && loginResponse.role!.toLowerCase() != "admin") {
-        Navigation().closeDialog(context);
-        if (!mounted) return;
-        showDialog(
-          context: context,
-          builder: (_) => OkDialog(text: "غير مسموح لهذا الحساب بالدخول"),
-        );
-        return;
-      }
+      // if (loginResponse.status == 1 && loginResponse.role!.toLowerCase() != "admin") {
+      //   Navigation().closeDialog(context);
+      //   if (!mounted) return;
+      //   showDialog(
+      //     context: context,
+      //     builder: (_) => OkDialog(text: "غير مسموح لهذا الحساب بالدخول"),
+      //   );
+      //   return;
+      // }
 
       final accountType = loginResponse.role ?? "";
 
@@ -207,12 +197,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           contentPadding: const EdgeInsets.all(15),
                           isDense: true,
                           border: loginRegisterTextBorder,
-                          errorBorder: loginRegisterTextBorder,
+                          errorBorder: errorBorder,
                           enabledBorder: loginRegisterTextBorder,
                           focusedBorder: loginRegisterTextBorder,
                           hintText: 'email'.tr(),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'valid_value'.tr() : null,
+                        validator: (text) {
+                          if (text?.isEmpty ?? false) {
+                            return "الرجاء ادخال البريد الالكتروني";
+                          }
+                          return null;
+                        },
                       ),
 
                       const SizedBox(height: 15),
@@ -230,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           contentPadding: const EdgeInsets.all(15),
                           isDense: true,
                           border: loginRegisterTextBorder,
-                          errorBorder: loginRegisterTextBorder,
+                          errorBorder: errorBorder,
                           enabledBorder: loginRegisterTextBorder,
                           focusedBorder: loginRegisterTextBorder,
                           hintText: 'password'.tr(),
@@ -239,14 +234,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () => setState(() => isHidden = !isHidden),
                           ),
                         ),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'valid_value'.tr() : null,
+                        validator: (text) {
+                          if (text?.isEmpty ?? false) {
+                            return "الرجاء ادخال كلمة المرور";
+                          }
+                          return null;
+                        },
                       ),
 
                       const SizedBox(height: 30),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _lodinWithId,
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              Navigation().showLoadingGifDialog(context);
+                              _loginWithId();
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: goSmartBlue,
                             padding: const EdgeInsets.symmetric(vertical: 14),
